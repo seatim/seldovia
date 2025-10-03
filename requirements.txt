@@ -1,0 +1,6 @@
+transformers==4.56.2
+torch==2.8.0
+matplotlib==3.10.6
+scikit-image==0.25.2
+click==8.3.0
+torchvision==0.23.0  # needed for AutoImageProcesser(..., use_fast=True)
