@@ -30,6 +30,17 @@ def load_image(path):
         return Image.open(path)
 
 
+def resize_image(image, img_size):
+    w, h = image.size
+    if w > img_size or h > img_size:
+        if w > h:
+            new_size = (img_size, int(h*img_size/w))
+        else:
+            new_size = (int(w*img_size/h), img_size)
+        image = image.resize(new_size, resample=Image.LANCZOS)
+    return image
+
+
 def visualize_segmentation(ax, results, image, model, alpha=0.5):
     """Visualize segmentation results by overlaying alpha mask with unique
     color for each object.
@@ -161,13 +172,14 @@ def semantic_to_instance(results, model):
 
 @click.command()
 @click.argument('path')
+@click.option('-z', '--img-size', default=1024, show_default=True)
 @click.option('-m', '--mode', type=click.Choice(list(CHECKPOINTS)),
               default="semantic", show_default=True)
 @click.option('-l', '--list-vocabulary', is_flag=True)
 @click.option('-L', '--list-backbone-vocabulary', is_flag=True)
-def main(path, mode, list_vocabulary, list_backbone_vocabulary):
+def main(path, img_size, mode, list_vocabulary, list_backbone_vocabulary):
 
-    image = load_image(path)
+    image = resize_image(load_image(path), img_size)
     results, model = run_segmentation(image, mode)
 
     if list_vocabulary:
