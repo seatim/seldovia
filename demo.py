@@ -179,7 +179,7 @@ def semantic_to_instance(results, model):
 @click.option('-L', '--list-backbone-vocabulary', is_flag=True)
 def main(path, img_size, mode, list_vocabulary, list_backbone_vocabulary):
 
-    image = resize_image(load_image(path), img_size)
+    image = resize_image(load_image(path).convert("RGB"), img_size)
     results, model = run_segmentation(image, mode)
 
     if list_vocabulary:
