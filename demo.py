@@ -1,5 +1,6 @@
 
 import sys
+from textwrap import fill
 
 import click
 import numpy as np
@@ -19,6 +20,7 @@ CHECKPOINTS = {
     "instance": "facebook/mask2former-swin-large-coco-instance",
     "panoptic": "facebook/mask2former-swin-base-coco-panoptic",
 }
+INDENT_KWARGS = dict(initial_indent="    ", subsequent_indent="    ")
 
 
 def load_image(path):
@@ -161,10 +163,25 @@ def semantic_to_instance(results, model):
 @click.argument('path')
 @click.option('-m', '--mode', type=click.Choice(list(CHECKPOINTS)),
               default="semantic", show_default=True)
-def main(path, mode):
+@click.option('-l', '--list-vocabulary', is_flag=True)
+@click.option('-L', '--list-backbone-vocabulary', is_flag=True)
+def main(path, mode, list_vocabulary, list_backbone_vocabulary):
 
     image = load_image(path)
     results, model = run_segmentation(image, mode)
+
+    if list_vocabulary:
+        print('Vocabulary of model:')
+        vocabulary = ', '.join(model.config.label2id)
+        print(fill(vocabulary, **INDENT_KWARGS))
+        print()
+
+    if list_backbone_vocabulary:
+        print('Vocabulary of backbone model:')
+        vocabulary = ', '.join(model.config.backbone_config.label2id)
+        print(fill(vocabulary, **INDENT_KWARGS))
+        print()
+
     fig, axes = plt.subplots(1, 3, figsize=(10, 3.5))
 
     axes = axes.flat
